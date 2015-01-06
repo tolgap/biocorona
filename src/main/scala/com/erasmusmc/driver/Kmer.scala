@@ -53,7 +53,7 @@ object Kmer extends App {
   val combinations = mutable.Map(permutationsWithRepetition(NUCLEOTIDES, slidingWindow)
     .map(e => (e.mkString, 0D)).toMap.toSeq: _*)
   //    Calculate the kmer frequencies by mapping over the keyValue RDD
-  val kmerFrequencies: RDD[String] = keyValue.map(calcFrequencies(_, combinations.clone(), slidingWindow))
+  val kmerFrequencies = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow))
   kmerFrequencies.saveAsTextFile(outputPath)
 
   def splitKeyValue(sequence: String): Option[Sequence] = {
@@ -61,24 +61,6 @@ object Kmer extends App {
     if (kv.size != 2) return None
     val seq = new Sequence(kv(0), kv(1).replaceAllLiterally(NEW_LINE, EMPTY))
     Some(seq)
-  }
-
-  def calcFrequencies(seq: Sequence, combinations: mutable.Map[String, Double], sw: Int): String = {
-    seq.sliding(sw).filterNot(isAmbiguous).foreach {
-      case kmer =>
-        if (kmer.length == sw) {
-          val count = combinations(kmer)
-          combinations(kmer) = count + 1D
-        }
-    }
-
-    val total = combinations.values.sum
-    val frequencies = combinations.values.map(_ / total)
-    seq.header + OUTPUT_SEPERATOR + frequencies.mkString(OUTPUT_SEPERATOR)
-  }
-
-  def isAmbiguous(kmer: String): Boolean = {
-    AMBIGUOUS_NUC.filter(kmer contains _).nonEmpty
   }
 
   def permutationsWithRepetition[T](input: List[T], n: Int): List[List[T]] = {

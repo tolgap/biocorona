@@ -1,7 +1,14 @@
 package com.erasmusmc
 
+import scala.collection.mutable
+
 class Sequence(header: String, seq: String) {
-  private final val UNDERSCORE = "_"
+  private final val UNDERSCORE    = "_"
+  private final val OUTPUT_SEP    = "\t"
+  private final val AMBIGUOUS_NUC = List(
+    'M', 'R', 'W', 'S', 'Y', 'K', 'V', 'H',
+    'D', 'B', 'X', 'N'
+  )
 
   def split(length: Int): Iterator[Sequence] = {
     val seqs = seq.grouped(length)
@@ -13,6 +20,24 @@ class Sequence(header: String, seq: String) {
 //  Delegates to String.sliding(Int)
   def sliding(sw: Int): Iterator[String] = {
     seq.sliding(sw)
+  }
+
+  def kmerFrequency(combinations: mutable.Map[String, Double], sw: Int): Iterable[Double] = {
+    sliding(sw).filterNot(isAmbiguous).foreach {
+      case kmer =>
+        if (kmer.length == sw) {
+          val count = combinations(kmer)
+          combinations(kmer) = count + 1D
+        }
+
+    }
+    val total = combinations.values.sum
+    val frequencies = combinations.values.map(_ / total)
+    header + OUTPUT_SEP + frequencies.mkString(OUTPUT_SEP)
+  }
+
+  def isAmbiguous(kmer: String): Boolean = {
+    AMBIGUOUS_NUC.filter(kmer contains _).nonEmpty
   }
 
   def header(): String = header
@@ -27,7 +52,6 @@ object Sequence {
 //  Note: this uses a lifted array
 //  to fully utilize the Option monad.
   def fromString(str: String): Option[Sequence] = {
-    if (str.lines.length < 2) return None
     val kv = str.trim.split(NEW_LINE, 2).lift
     (kv(0), kv(1)) match {
       case (Some(k), Some(s)) =>
