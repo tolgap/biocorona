@@ -20,6 +20,7 @@ object Length extends App {
   job.getConfiguration.set("textinputformat.record.delimiter", SEPARATOR)
 
   val filePath = args(0)
+  val outputPath = args(1)
 
   //    Using the Hadoop Job, read the file with the new delimiter
   val input = sc.newAPIHadoopFile(
@@ -37,11 +38,5 @@ object Length extends App {
 
   //    Get the lengths of all sequences
   val lengths: RDD[Vector] = keyValue.map(e => Vectors.dense(e.seq.length)).cache
-  val summary: MultivariateStatisticalSummary = Statistics.colStats(lengths)
-
-  println(s"Count: ${summary.count}")
-  println(s"Min: ${summary.min}")
-  println(s"Mean: ${summary.mean}")
-  println(s"Variance: ${summary.variance}")
-  println(s"Max: ${summary.max}")
+  lengths.saveAsTextFile(outputPath)
 }
