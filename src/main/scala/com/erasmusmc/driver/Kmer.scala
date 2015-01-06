@@ -46,7 +46,7 @@ object Kmer extends App {
   val combinations = mutable.Map(permutationsWithRepetition(NUCLEOTIDES, slidingWindow)
     .map(e => (e.mkString, 0D)).toMap.toSeq: _*)
   //    Calculate the kmer frequencies by mapping over the keyValue RDD
-  val kmerFrequencies: RDD[String] = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow))
+  val kmerFrequencies: RDD[String] = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow)).cache
   kmerFrequencies.saveAsTextFile(outputPath)
 
   def permutationsWithRepetition[T](input: List[T], n: Int): List[List[T]] = {

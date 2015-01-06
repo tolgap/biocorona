@@ -22,6 +22,10 @@ class Sequence(header: String, seq: String) {
     seq.sliding(sw)
   }
 
+//  Calculate the k-mer frequency based on the
+//  sliding window. It results in a String
+//  with the format:
+//  Header \t frequencies \n
   def kmerFrequency(combinations: mutable.Map[String, Double], sw: Int): String = {
     sliding(sw).filterNot(isAmbiguous).foreach {
       case kmer =>
@@ -36,10 +40,13 @@ class Sequence(header: String, seq: String) {
     header + OUTPUT_SEP + frequencies.mkString(OUTPUT_SEP)
   }
 
+//  Checks if a (sub)sequence contains
+//  abmiguous nucleotides.
   def isAmbiguous(kmer: String): Boolean = {
     AMBIGUOUS_NUC.filter(kmer contains _).nonEmpty
   }
 
+//  Getters for the class
   def header(): String = header
   def seq():    String = seq
 }
