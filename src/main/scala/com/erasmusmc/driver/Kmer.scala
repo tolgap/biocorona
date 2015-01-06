@@ -13,14 +13,7 @@ import org.apache.spark.{SparkContext, SparkConf}
 object Kmer extends App {
 
   private final val SEPARATOR        = ">"
-  private final val NEW_LINE         = "\n"
-  private final val OUTPUT_SEPERATOR = "\t"
-  private final val EMPTY            = ""
   private final val NUCLEOTIDES      = List("A", "T", "C", "G")
-  private final val AMBIGUOUS_NUC    = List(
-    'M', 'R', 'W', 'S', 'Y', 'K', 'V', 'H',
-    'D', 'B', 'X', 'N'
-  )
 
   //    Set up Spark configuration and context
   val conf = new SparkConf().setAppName("SparkKmerFrequency")
@@ -55,13 +48,6 @@ object Kmer extends App {
   //    Calculate the kmer frequencies by mapping over the keyValue RDD
   val kmerFrequencies = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow))
   kmerFrequencies.saveAsTextFile(outputPath)
-
-  def splitKeyValue(sequence: String): Option[Sequence] = {
-    val kv = sequence.trim.split(NEW_LINE, 2)
-    if (kv.size != 2) return None
-    val seq = new Sequence(kv(0), kv(1).replaceAllLiterally(NEW_LINE, EMPTY))
-    Some(seq)
-  }
 
   def permutationsWithRepetition[T](input: List[T], n: Int): List[List[T]] = {
     n match {
