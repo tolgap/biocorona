@@ -36,7 +36,7 @@ object Kmer extends App {
   )
 
   //    Drop the line numbers and only keep the sequences
-  val sequences = input.map {case (_, text) => text.toString}
+  val sequences: RDD[String] = input.map {case (_, text) => text.toString}
   //    Split the header and sequence
   //    Split the sequence to a maximum of 1000 bps.
   val keyValue: RDD[Sequence] = sequences.flatMap(Sequence.fromString).flatMap(_ split 1000).cache
@@ -46,7 +46,7 @@ object Kmer extends App {
   val combinations = mutable.Map(permutationsWithRepetition(NUCLEOTIDES, slidingWindow)
     .map(e => (e.mkString, 0D)).toMap.toSeq: _*)
   //    Calculate the kmer frequencies by mapping over the keyValue RDD
-  val kmerFrequencies = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow))
+  val kmerFrequencies: RDD[String] = keyValue.map(_.kmerFrequency(combinations.clone(), slidingWindow))
   kmerFrequencies.saveAsTextFile(outputPath)
 
   def permutationsWithRepetition[T](input: List[T], n: Int): List[List[T]] = {
