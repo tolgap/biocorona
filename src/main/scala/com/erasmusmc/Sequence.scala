@@ -22,7 +22,7 @@ class Sequence(header: String, seq: String) {
     seq.sliding(sw)
   }
 
-  def kmerFrequency(combinations: mutable.Map[String, Double], sw: Int): Iterable[Double] = {
+  def kmerFrequency(combinations: mutable.Map[String, Double], sw: Int): String = {
     sliding(sw).filterNot(isAmbiguous).foreach {
       case kmer =>
         if (kmer.length == sw) {
