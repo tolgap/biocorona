@@ -41,7 +41,7 @@ class Sequence(header: String, seq: String) {
   }
 
 //  Checks if a (sub)sequence contains
-//  abmiguous nucleotides.
+//  ambiguous nucleotides.
   def isAmbiguous(kmer: String): Boolean = {
     AMBIGUOUS_NUC.filter(kmer contains _).nonEmpty
   }
