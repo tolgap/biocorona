@@ -37,6 +37,6 @@ object Length extends App {
   val keyValue: RDD[Sequence] = sequences.flatMap(Sequence.fromString).cache
 
   //    Get the lengths of all sequences
-  val lengths: RDD[Vector] = keyValue.map(e => Vectors.dense(e.seq.length)).cache
-  lengths.saveAsTextFile(outputPath)
+  val lengths: RDD[Int] = keyValue.map(_.seq.length).cache
+  lengths.coalesce(1, true).saveAsTextFile(outputPath)
 }
