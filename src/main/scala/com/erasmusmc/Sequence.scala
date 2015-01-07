@@ -16,9 +16,9 @@ class Sequence(header: String, seq: String) {
     }
   }
 
-//  Delegates to String.sliding(Int)
-  def sliding(sw: Int): Iterator[String] = {
-    seq.sliding(sw)
+//  Delegates to String.sliding(Int, Int)
+  def slidingWindow(sw: Int): Iterator[String] = {
+    seq.sliding(sw, sw).filter(_.length == sw)
   }
 
 //  Calculate the k-mer frequency based on the
